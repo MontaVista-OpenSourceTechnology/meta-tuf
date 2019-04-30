@@ -1,0 +1,75 @@
+A layer that builds The Update Framework in Yocto
+
+Dependencies
+============
+
+This layer depends on:
+
+  URI: git://git.yoctoproject.org/poky
+  branch: rocko
+ 
+  or
+
+  URI: git://git.openembedded.org/openembedded-core
+  branch: rocko
+
+  URI: git://git.openembedded.org/bitbake
+  branch: 1.36
+
+  URI: https://github.com/MontaVista-OpenSourceTechnology/meta-montavista-cgx
+  branch: rocko
+
+  URI: git://git.openembedded.org/meta-openembedded
+  layers: meta-perl, meta-gnome, meta-multimedia, xfce-layer 
+  branch: rocko
+
+Source code
+===========
+
+https://github.com/MontaVista-OpenSourceTechnology/meta-tuf
+
+
+Maintenance
+===========
+
+Maintainers:
+    support@mvista.com
+
+
+Contributing
+============
+
+Contributions and patches can be sent to the MontaVista  mailing
+list: support@mvista.com"
+
+When sending patches please take a look at the contribution guide available
+here: https://wiki.yoctoproject.org/wiki/Contribution_Guidelines
+
+example:
+git send-email -1 -M --to support@mvista.com  --subject-prefix=meta-montavista-cgx][PATCH
+
+
+Table of Contents
+=================
+
+  I. Adding the meta-tuf layer to your build
+
+
+I. Adding the meta-tuf layer to your build
+=================================================
+
+In order to use this layer, you need to make the build system aware of
+it.
+
+Assuming the meta-montavista-cgl layer exists at the top-level of your
+yocto build tree, you can add it to the build system by adding the
+location of the meta-montavista-cgl layer to bblayers.conf, along with any
+other layers needed. Adapt the below list to proper format.
+
+  BBLAYERS:
+
+    meta
+    meta-openembedded/meta-networking
+    meta-openembedded/meta-oe
+    meta-openembedded/meta-python
+    meta-openembedded/meta-webserver
