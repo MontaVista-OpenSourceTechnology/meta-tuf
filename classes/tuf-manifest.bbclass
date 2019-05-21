@@ -31,3 +31,16 @@ python tuf_manifest () {
             os.remove(manifest_link)
         os.symlink(os.path.basename(manifest_name), manifest_link)
 }
+
+TUF_MANIFEST_USER_FILENAME ?= "manifest"
+TUF_MANIFEST_CURRENT_FILENR = "${@tuf_manifest_get_filenr(d)}"
+TUF_MANIFEST_FILENR ?= "${TUF_MANIFEST_CURRENT_FILENR}"
+
+def tuf_manifest_get_filenr(d):
+    import os
+    deploy_dir = d.getVar('DEPLOY_DIR_IMAGE')
+    fname = d.getVar('TUF_MANIFEST_USER_FILENAME')
+    i = 1
+    while os.path.exists(os.path.join(deploy_dir, fname + '.' + str(i))):
+        i = i + 1
+    return str(i)
