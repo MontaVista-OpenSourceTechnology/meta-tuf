@@ -53,6 +53,9 @@ Table of Contents
 =================
 
   I. Adding the meta-tuf layer to your build
+ II. Using meta-tuf
+III. Key update
+ IV. ostree and ostree-rpm
 
 
 I. Adding the meta-tuf layer to your build
@@ -73,3 +76,123 @@ other layers needed. Adapt the below list to proper format.
     meta-openembedded/meta-oe
     meta-openembedded/meta-python
     meta-openembedded/meta-webserver
+
+II. Using meta-tuf
+==================
+
+The meta-tuf layer is a little bit unusual because it is a setup to
+allow deployment to a remote system.  It sets things up to use the
+tuf-manifest repo tool deploying updates, and it installs the
+tuf-manifest client tool on the client with the configuration files
+specified in local.conf.  It also create the proper manifest files so
+tufm-repo can use them to install files into a TUF repository.
+
+Using this tool does require knowledge of The Update Framework (TUF).
+See https://theupdateframework.github.io/ for that.  How you configure
+things has security implications.
+
+You should also refer to the tuf-manifest package documentation.
+
+The following variables are used by meta-tuf and can be used to
+control it's operation.  These are:
+
+TUF_MANIFEST_DIR ?= "${DEPLOY_DIR_IMAGE}"
+
+The place where the tuf-manifest manifest files will be stored.  By
+default this is the standard image directory, but it can be any other
+place that you want to maintain it (so it can be backed up, etc.).
+
+TUF_MANIFEST_USER_FILENAME ?= "manifest"
+
+The base name of the manifest files.  These will have a '.<num>'
+appended to them for version, so manifest.1 is the first version,
+manifest.2 the second, etc.  The default is "manifest".
+
+TUF_MANIFEST_FILENR ?= "${TUF_MANIFEST_CURRENT_FILENR}"
+
+The next file number for a manifest number.  This is used to set the
+client manifest number it uses to know what version it is on. By
+default TIF_MANIFEST_DIR is scanned for files named
+TUF_MANIFEST_USER_FILENAME.<num>, this variable will be set to the
+next sequence it finds.  So if manifest.1 and manifest.2 are there,
+this variable will be "3".  If there is no manifest file, it will
+be set to "1".  Manifest files must be in sequence!
+
+TUF_MANIFEST_CLIENT_REPO
+
+This is the client repository directory that you create when creating
+your TUF repo.  It is installed on the client.
+
+TUF_MANIFEST_CONF
+
+The tuf-manifest configuration file to install on the client.  This
+sets the URL where updates will come from, the handler for updates,
+etc.
+
+The basic procedure is:
+
+ 1) Get your image working like you want.  The builds themselves are
+    not tied to the framework directly, you have to add them by hand.
+    So you can build, test, rebuild, etc. until you get what you want,
+    then add them.
+
+ 2) Add
+      INHERIT =+ "tuf-manifest"
+    to your local.conf and rebuild.  This will create the manifest file.
+    Set the necessary variables as described above.
+
+ 2) Create a TUF repo.  You can do this with the repo.py tool from
+    TUF.  You can also use the tufm-repo tool that is part of
+    tuf-manifest, since it is a wrapper around the repo tool.  This is
+    an important step to get right, as it will affect the security of
+    your system.  For best security, you should:
+    a) Create the repo on an air-gapped machine, and set the number
+       of root keys (generally a minimum of 3).
+    b) Create separate root signing keys on other machines (generally
+       at least two other machine) and sign the repo with those keys.
+       Make sure not to transfer the root keys off the machine they
+       were created on.
+    c) Transfer the repo to the build machine (preferably air-gapped)
+       without the root keys, of course, just the target, snapshot,
+       and timestamp keys.  This is where you will install the files
+       with tufm-repo.
+    With this setup, you can survive the loss of any single key.
+
+ 3) Copy the tmp/deploy/images/<target>/<imagename>.tuf-manifest to
+    TUF_MANIFEST_DIR/manifest.1.  This will be the first version of
+    the image.
+
+ 4) Run
+      tufm-repo --load-manifest --manifest TUF_MANIFEST_DIR/manifest.1 
+        --manifest-dir tmp/deploy/rpm/*
+    To process the manifest and load all the files into the repository.
+
+ 5) Copy the repository to your web server.
+
+ 6) Deploy your target system and have it run tufm-client periodically.
+    this will look for updates and install them automatically.
+
+To deploy the next update:
+
+ 1) Make the necessary changes, build, test, etc. as you normally
+    would.
+
+ 2) Copy the tmp/deploy/images/<target>/<imagename>.tuf-manifest to
+    TUF_MANIFEST_DIR/manifest.2.  This will be the second version of
+    the image.
+
+Then follow steps 3-5 above.  Your clients will automatically pick up
+the changes and install them.
+
+III. Key update
+===============
+
+If a key is compromised or it going to expire, or you need to issue a
+new root metadata file because it is going to expire...
+
+*Write this*
+
+IV. ostree and ostree-rpm
+=========================
+
+describe how to use ostree and ostree-rpm
