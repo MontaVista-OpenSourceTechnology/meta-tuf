@@ -31,8 +31,11 @@ FILES_${PN}-client = " \
     ${bindir}/tufm-client \
     ${libdir}/${PYTHON_DIR}/site-packages/tuf_manifest/scripts/tuf_manifest_client.py \
     ${libdir}/${PYTHON_DIR}/site-packages/tuf_manifest/scripts/tuf_manifest_client.pyc \
-    ${localstatedir}/tuf-manifest \
+"
+
+CONFFILES_${PN}-client = " \
     ${sysconfdir}/tuf-manifest.conf \
+    ${localstatedir}/tuf-manifest \
 "
 
 FILES_${PN}-repo = " \
