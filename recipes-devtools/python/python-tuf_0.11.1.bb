@@ -10,6 +10,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=8cc789b082b3d97e1ccc5261f8594d3f \
 SRC_URI += " \
     file://LICENSE \
     file://LICENSE-MIT \
+    file://0001-Split-up-parse_arguments.patch \
+    file://0002-Split-out-write_updated_targets-from-add_targets.patch \
 "
 PYPI_PACKAGE = "tuf"
 
@@ -50,10 +52,12 @@ FILES_${PN}-simple-server = " \
 
 RDEPENDS_${PN}-client += " \
     ${PYTHON_PN}-argparse \
+    ${PYTHON_PN}-tuf \
 "
 
 RDEPENDS_${PN}-repo += " \
     ${PYTHON_PN}-argparse \
+    ${PYTHON_PN}-tuf \
 "
 
 BASE_TUF_RDEPENDS = " \

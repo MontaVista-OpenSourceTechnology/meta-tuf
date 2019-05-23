@@ -1,0 +1,72 @@
+From 25086378d8f5e991055fa9a7506e0d25e690337a Mon Sep 17 00:00:00 2001
+From: Corey Minyard <cminyard@mvista.com>
+Date: Wed, 22 May 2019 14:01:36 -0500
+Subject: [PATCH 2/2] Split out write_updated_targets from add_targets
+
+This makes some useful common code for upstream users.
+
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+---
+ tuf/scripts/repo.py | 39 +++++++++++++++++++++++----------------
+ 1 file changed, 23 insertions(+), 16 deletions(-)
+
+diff --git a/tuf/scripts/repo.py b/tuf/scripts/repo.py
+index d9afa98..ab8e545 100755
+--- a/tuf/scripts/repo.py
++++ b/tuf/scripts/repo.py
+@@ -654,22 +654,9 @@ def remove_target_files_from_metadata(parsed_arguments, repository):
+ 
+ 
+ 
+-def add_targets(parsed_arguments):
+-  repo_targets_path = os.path.join(parsed_arguments.path, REPO_DIR, 'targets')
+-  repository = repo_tool.load_repository(
+-      os.path.join(parsed_arguments.path, REPO_DIR))
+-
+-  # Copy the target files in --path to the repo directory, and
+-  # add them to Targets metadata.  Make sure to also copy & add files
+-  # in directories (and subdirectories, if --recursive is True).
+-  for target_path in parsed_arguments.add:
+-    if os.path.isdir(target_path):
+-      for sub_target_path in repository.get_filepaths_in_directory(
+-          target_path, parsed_arguments.recursive):
+-        add_target_to_repo(parsed_arguments, sub_target_path, repo_targets_path, repository)
+-
+-    else:
+-      add_target_to_repo(parsed_arguments, target_path, repo_targets_path, repository)
++def write_updated_targets(parsed_arguments, repository):
++  """Take changes in the given repository and write them to the disk,
++  using the proper keys and requested."""
+ 
+   consistent_snapshot = tuf.roledb.get_roleinfo('root',
+       repository._repository_name)['consistent_snapshot']
+@@ -709,6 +696,26 @@ def add_targets(parsed_arguments):
+ 
+ 
+ 
++def add_targets(parsed_arguments):
++  repo_targets_path = os.path.join(parsed_arguments.path, REPO_DIR, 'targets')
++  repository = repo_tool.load_repository(
++      os.path.join(parsed_arguments.path, REPO_DIR))
++
++  # Copy the target files in --path to the repo directory, and
++  # add them to Targets metadata.  Make sure to also copy & add files
++  # in directories (and subdirectories, if --recursive is True).
++  for target_path in parsed_arguments.add:
++    if os.path.isdir(target_path):
++      for sub_target_path in repository.get_filepaths_in_directory(
++          target_path, parsed_arguments.recursive):
++        add_target_to_repo(parsed_arguments, sub_target_path, repo_targets_path, repository)
++
++    else:
++      add_target_to_repo(parsed_arguments, target_path, repo_targets_path, repository)
++
++  write_updated_targets(parsed_arguments, repository)
++
++
+ def remove_targets(parsed_arguments):
+   repository = repo_tool.load_repository(
+       os.path.join(parsed_arguments.path, REPO_DIR))
+-- 
+2.17.1
+

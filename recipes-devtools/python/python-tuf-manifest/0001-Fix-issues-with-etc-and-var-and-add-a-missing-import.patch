@@ -1,0 +1,43 @@
+From 2d281498c9c3601ebb9d628eeb5fe29661cef0ae Mon Sep 17 00:00:00 2001
+From: Corey Minyard <cminyard@mvista.com>
+Date: Thu, 23 May 2019 08:02:20 -0500
+Subject: [PATCH] Fix issues with etc and var and add a missing import
+
+Get a "/" at the beginning.
+
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+---
+ tuf_manifest/scripts/tufm-client    | 1 +
+ tuf_manifest/tuf_manifest_client.py | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/tuf_manifest/scripts/tufm-client b/tuf_manifest/scripts/tufm-client
+index da182df..3a31acd 100755
+--- a/tuf_manifest/scripts/tufm-client
++++ b/tuf_manifest/scripts/tufm-client
+@@ -6,6 +6,7 @@
+ import argparse
+ import tuf
+ import tuf_manifest.tuf_manifest_client as tufmc
++import sys
+ 
+ if __name__ == '__main__':
+     parser = argparse.ArgumentParser(description="Do a TUF update")
+diff --git a/tuf_manifest/tuf_manifest_client.py b/tuf_manifest/tuf_manifest_client.py
+index 48bed30..45ae857 100755
+--- a/tuf_manifest/tuf_manifest_client.py
++++ b/tuf_manifest/tuf_manifest_client.py
+@@ -22,8 +22,8 @@ import tuf.log
+ 
+ logger = logging.getLogger('tuf.scripts.client')
+ 
+-default_conffile = os.path.join("etc", "tuf-manifest.conf")
+-default_vardir = os.path.join("var", "tuf-manifest")
++default_conffile = os.path.join(os.sep + "etc", "tuf-manifest.conf")
++default_vardir = os.path.join(os.sep + "var", "tuf-manifest")
+ 
+ # FIXME - add an option to apply all manifests in sequence, to avoid
+ # downloading large amounts of data, especially for delta updates.
+-- 
+2.17.1
+

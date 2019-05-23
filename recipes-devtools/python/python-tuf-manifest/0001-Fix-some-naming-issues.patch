@@ -1,0 +1,47 @@
+From 7c9c381f5bbcd1a16390ff9f2545eb7adcaab939 Mon Sep 17 00:00:00 2001
+From: Corey Minyard <cminyard@mvista.com>
+Date: Thu, 23 May 2019 07:25:19 -0500
+Subject: [PATCH] Fix some naming issues
+
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+---
+ tuf_manifest/scripts/tufm-client  | 4 ++--
+ tuf_manifest/tuf_manifest_repo.py | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tuf_manifest/scripts/tufm-client b/tuf_manifest/scripts/tufm-client
+index a613b23..ec3e3f5 100755
+--- a/tuf_manifest/scripts/tufm-client
++++ b/tuf_manifest/scripts/tufm-client
+@@ -5,7 +5,7 @@
+ 
+ import argparse
+ import tuf
+-import tuf_manifest_client from tuf_manifest.tuf_manifest_client
++import tuf_manifest.tuf_manifest_client as tufmc
+ 
+ if __name__ == '__main__':
+     parser = argparse.ArgumentParser(description="Do a TUF update")
+@@ -13,5 +13,5 @@ if __name__ == '__main__':
+                         help="The configuration file to use",
+                         default=None)
+     args = parser.parse_args()
+-    c = tuf_manifest_client(conffile=args.conffile)
++    c = tufmc.tuf_manifest_client(conffile=args.conffile)
+     sys.exit(c.do_update())
+diff --git a/tuf_manifest/tuf_manifest_repo.py b/tuf_manifest/tuf_manifest_repo.py
+index cdfb876..0bbd6f4 100644
+--- a/tuf_manifest/tuf_manifest_repo.py
++++ b/tuf_manifest/tuf_manifest_repo.py
+@@ -180,7 +180,7 @@ def process_arguments(arguments):
+         update_timestamp(arguments)
+     if arguments.load_manifest:
+         load_manifests(arguments)
+-    tuf.scripts.repo.process_command_line_arguments(arguments)
++    tuf.scripts.repo.process_arguments(arguments)
+     return
+ 
+ def parse_arguments():
+-- 
+2.17.1
+

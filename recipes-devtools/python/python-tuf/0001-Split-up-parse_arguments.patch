@@ -1,0 +1,138 @@
+From d0abe347e3d467cbc08025c9549fc24c2661d3db Mon Sep 17 00:00:00 2001
+From: Corey Minyard <cminyard@mvista.com>
+Date: Thu, 2 May 2019 18:05:11 +0000
+Subject: [PATCH 1/2] Split up parse_arguments()
+
+This will allow a script to use repo.py as a base and build
+on top of its capability.  Another script can create the
+argument parser, add its own arguments, process the log
+arguments, do its own custom processing, then call
+process_comand_line_arguments for the repo-generic functions.
+
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+---
+ tuf/scripts/repo.py | 82 +++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 64 insertions(+), 18 deletions(-)
+
+diff --git a/tuf/scripts/repo.py b/tuf/scripts/repo.py
+index 4ade3cc..d9afa98 100755
+--- a/tuf/scripts/repo.py
++++ b/tuf/scripts/repo.py
+@@ -856,21 +856,10 @@ def set_top_level_keys(repository, parsed_arguments):
+ 
+ 
+ 
+-def parse_arguments():
++def create_argument_parser():
+   """
+   <Purpose>
+-    Parse the command-line arguments.  Also set the logging level, as specified
+-    via the --verbose argument (2, by default).
+-
+-    Example:
+-      # Create a TUF repository in the current working directory.  The
+-      # top-level roles are created, each containing one key.
+-      $ repo.py --init
+-
+-      $ repo.py --init --bare --consistent --verbose 3
+-
+-    If a required argument is unset, a parser error is printed and the script
+-    exits.
++    Create the command-line arguments parser for the TUF repo command.
+ 
+   <Arguments>
+     None.
+@@ -879,11 +868,10 @@ def parse_arguments():
+     None.
+ 
+   <Side Effects>
+-    Sets the logging level for TUF logging.
++    None.
+ 
+   <Returns>
+-    A tuple ('options.REPOSITORY_PATH', command, command_arguments).  'command'
+-    'command_arguments' correspond to a repository tool fuction.
++    An ArgumentParser object with the standard repo commands.
+   """
+ 
+   parser = argparse.ArgumentParser(
+@@ -1007,9 +995,28 @@ def parse_arguments():
+       ' levels: 0=UNSET, 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR,'
+       ' 5=CRITICAL')
+ 
+-  # Should we include usage examples in the help output?
++  return parser
++
+ 
+-  parsed_args = parser.parse_args()
++
++def process_log_arguments(parsed_args):
++  """
++  <Purpose>
++    Set the logging level, as specified via the --verbose argument
++    (2, by default).
++
++  <Arguments>
++    None.
++
++  <Exceptions>
++    None.
++
++  <Side Effects>
++    Sets the logging level for TUF logging.
++
++  <Returns>
++    None.
++  """
+ 
+   # Set the logging level.
+   if parsed_args.verbose == 5:
+@@ -1030,6 +1037,45 @@ def parse_arguments():
+   else:
+     tuf.log.set_log_level(logging.NOTSET)
+ 
++
++
++def parse_arguments():
++  """
++  <Purpose>
++    Parse the command-line arguments.  Also set the logging level, as specified
++    via the --verbose argument (2, by default).
++
++    Example:
++      # Create a TUF repository in the current working directory.  The
++      # top-level roles are created, each containing one key.
++      $ repo.py --init
++
++      $ repo.py --init --bare --consistent --verbose 3
++
++    If a required argument is unset, a parser error is printed and the script
++    exits.
++
++  <Arguments>
++    None.
++
++  <Exceptions>
++    None.
++
++  <Side Effects>
++    Sets the logging level for TUF logging.
++
++  <Returns>
++    The parsed argument dictionary.
++  """
++
++  parser = create_argument_parser()
++
++  # Should we include usage examples in the help output?
++
++  parsed_args = parser.parse_args()
++
++  process_log_arguments(parsed_args.verbose)
++
+   return parsed_args
+ 
+ 
+-- 
+2.17.1
+

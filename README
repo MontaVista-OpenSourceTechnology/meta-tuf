@@ -165,6 +165,7 @@ The basic procedure is:
       IMAGE_INSTALL_append = " python-tuf-client"
       TUF_MANIFEST_CLIENT_REPO = "/path/to/tuf/tufclient"
       TUF_MANIFEST_CONF = "/path/to/tuf-manifest.conf"
+      EXTRA_IMAGE_FEATURES += "package-management"
     to your local.conf and rebuild.  This will create the manifest file
     and put tuf-manifest-client onto the target.  The two variables shown
     are required, you may need to set other variables as described above.
