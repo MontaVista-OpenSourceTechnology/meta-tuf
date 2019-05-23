@@ -174,7 +174,7 @@ The basic procedure is:
     required, you may need to set other variables as described above.
 
     Note that you cannot do the above until you have the repo in place
-    on the target directory.  The repo and conf files must be in place.
+    on the build system.  The repo and conf files must be in place.
     You could do step 2 first, then step 1 and 3 together.
 
     The full format of tuf-manifest.conf is describe in the tuf_manifest
