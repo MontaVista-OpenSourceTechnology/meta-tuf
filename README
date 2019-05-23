@@ -195,20 +195,30 @@ The basic procedure is:
     that is a simple script that will update RPM packages, you can
     use that for the handler if you are doing straight RPM.
 
- 4) Copy the tmp/deploy/images/<target>/<imagename>.tuf-manifest to
+ 4) Build the host version of the tuf-manifest tools:
+
+      bitbake python-tuf-native python-tuf-manifest.native
+      bitbake build-sysroots
+      source <the proper env script in the project bin directory>
+      export PYTHONPATH=${BUILDROOT}/tmp/sysroots/x86_64/usr/lib/python2.7/site-packages
+
+    This will get the tufm-repo command into your path.  Hopefully
+    the PYTHONPATH thing will go away, but it's necessary for now.
+
+ 5) Copy the tmp/deploy/images/<target>/<imagename>.tuf-manifest to
     <TUF_MANIFEST_DIR>/manifest.1.  This will be the first version of
     the image.  The filename "manifest.<n>" is the default, you can use
     a different base name if you like, you just need to set it properly
     in the tuf-manifest.conf file on the target.
 
- 5) Run:
+ 6) Run:
       tufm-repo --load-manifest --manifest <TUF_MANIFEST_DIR>/manifest.1 
         --manifest-dir tmp/deploy/rpm/*
     To process the manifest and load all the files into the repository.
 
- 6) Copy the repository to your web server.
+ 7) Copy the repository to your web server.
 
- 7) Deploy your target system and have it run tufm-client
+ 8) Deploy your target system and have it run tufm-client
     periodically.  this will look for updates and install them
     automatically.  You should log output and errors from tufm-client.
 
@@ -225,7 +235,7 @@ To deploy the next update:
     TUF_MANIFEST_DIR/manifest.2.  This will be the second version of
     the image.
 
-Then follow steps 4-6 above.  Your clients will automatically pick up
+Then follow steps 4-7 above.  Your clients will automatically pick up
 the changes and install them.
 
 III. Key update
