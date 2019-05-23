@@ -4,16 +4,14 @@ SECTION = "devel/python"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d36b156c33ff4e31d4892fe82a3fb978"
 
-SRC_URI += "\
+SRC_URI += " \
     file://tuf-rpm-updater \
-    file://0001-Fix-some-naming-issues.patch \
-    file://0001-Fix-issues-with-etc-and-var-and-add-a-missing-import.patch \
 "
 
 PYPI_PACKAGE = "tuf_manifest"
 
-SRC_URI[md5sum] = "c081aec51d4173ec39e7c5e80311cde7"
-SRC_URI[sha256sum] = "be6f249841400361091fa41b80de1fb0b9cef3f7b1015c68d8d76bfd0a3220fd"
+SRC_URI[md5sum] = "874bdcf202b54a2742db7023b8fddc16"
+SRC_URI[sha256sum] = "b62234aca76ba4d84558b0ed5b6498c79287780611e54378488b3e84407a8905"
 
 inherit setuptools pypi
 inherit tuf-manifest
@@ -43,7 +41,7 @@ FILES_${PN}-client = " \
     ${libdir}/${PYTHON_DIR}/site-packages/tuf_manifest/tuf_manifest_client.pyc \
     ${sysconfdir}/tuf-manifest.conf \
     ${localstatedir}/tuf-manifest \
-    ${libdir}/tuf-manifest/scripts/tuf-rpm-updater
+    ${libdir}/tuf-manifest/scripts/tuf-rpm-updater \
 "
 
 CONFFILES_${PN}-client = " \
