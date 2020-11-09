@@ -7,23 +7,21 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=8cc789b082b3d97e1ccc5261f8594d3f \
 
 # For some reason tuf in the PIP repository doesn't have the licenses.
 # These are from the git repository.
+
 SRC_URI += " \
-    file://LICENSE \
-    file://LICENSE-MIT \
-    file://0001-Split-up-parse_arguments.patch \
-    file://0002-Split-out-write_updated_targets-from-add_targets.patch \
+    file://0001-TUF-Split-up-parse_arguments.patch \
+    file://0002-TUF-Split-out-write-updated-targets-from-add-targets.patch \
 "
 PYPI_PACKAGE = "tuf"
 
-SRC_URI[md5sum] = "c26ef0f0bda6e2dbfa4ed0160e0625d4"
-SRC_URI[sha256sum] = "65d5f87a41830494bf585f8a5082618ab26015d156a67f23e37552419e427cf1"
+SRC_URI[md5sum] = "ad5d10bc22c965da17c4dbbecb1e6248"
+SRC_URI[sha256sum] = "e0653e1339031d018212d593879f96152af212aaf07a205ebcfc65d62f76679c"
 
-inherit setuptools pypi
+inherit setuptools3 pypi
 
 do_install_append() {
     mv ${D}${bindir}/client.py ${D}${bindir}/tuf-client
     mv ${D}${bindir}/repo.py ${D}${bindir}/tuf-repo
-    mv ${D}${bindir}/simple_server.py ${D}${bindir}/tuf-simple_server
 }
 
 PACKAGES =+ " \
@@ -51,12 +49,10 @@ FILES_${PN}-simple-server = " \
 "
 
 RDEPENDS_${PN}-client += " \
-    ${PYTHON_PN}-argparse \
     ${PYTHON_PN}-tuf \
 "
 
 RDEPENDS_${PN}-repo += " \
-    ${PYTHON_PN}-argparse \
     ${PYTHON_PN}-tuf \
 "
 
@@ -76,14 +72,5 @@ RDEPENDS_${PN} += "${BASE_TUF_RDEPENDS}"
 
 # There is no native[sdk] version of python-misc, but we need it on the target.
 RDEPENDS_${PN}_class-target += "${BASE_TUF_RDEPENDS} ${PYTHON_PN}-misc"
-
-do_unpack_tuf_licenses() {
-    cp ${WORKDIR}/LICENSE ${S}
-    cp ${WORKDIR}/LICENSE-MIT ${S}
-}
-
-python do_unpack_append() {
-    bb.build.exec_func('do_unpack_tuf_licenses', d)
-}
 
 BBCLASSEXTEND = "native nativesdk"

@@ -1,3 +1,10 @@
+From e6aa9fedae4bdf45448cffc423a9b0bc1d2d5a13 Mon Sep 17 00:00:00 2001
+From: Milan Satpathy <msatpathy@mvista.com>
+Date: Sun, 8 Nov 2020 19:32:50 +0530
+Subject: [PATCH 1/2] TUF: Split up parse_arguments
+
+Backport from:
+
 From d0abe347e3d467cbc08025c9549fc24c2661d3db Mon Sep 17 00:00:00 2001
 From: Corey Minyard <cminyard@mvista.com>
 Date: Thu, 2 May 2019 18:05:11 +0000
@@ -10,18 +17,20 @@ arguments, do its own custom processing, then call
 process_comand_line_arguments for the repo-generic functions.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Signed-off-by: Milan Satpathy <msatpathy@mvista.com>
 ---
- tuf/scripts/repo.py | 82 +++++++++++++++++++++++++++++++++++----------
- 1 file changed, 64 insertions(+), 18 deletions(-)
+ tuf/scripts/repo.py | 102 ++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 80 insertions(+), 22 deletions(-)
 
 diff --git a/tuf/scripts/repo.py b/tuf/scripts/repo.py
-index 4ade3cc..d9afa98 100755
+index 93fb935..15e5ad6 100755
 --- a/tuf/scripts/repo.py
 +++ b/tuf/scripts/repo.py
-@@ -856,21 +856,10 @@ def set_top_level_keys(repository, parsed_arguments):
+@@ -955,22 +955,10 @@ def set_top_level_keys(repository, parsed_arguments):
+   repository.timestamp.load_signing_key(timestamp_private)
  
  
- 
+-
 -def parse_arguments():
 +def create_argument_parser():
    """
@@ -38,11 +47,11 @@ index 4ade3cc..d9afa98 100755
 -
 -    If a required argument is unset, a parser error is printed and the script
 -    exits.
-+    Create the command-line arguments parser for the TUF repo command.
++  Create the command-line arguments parser for the TUF repo command.
  
    <Arguments>
      None.
-@@ -879,11 +868,10 @@ def parse_arguments():
+@@ -979,11 +967,10 @@ def parse_arguments():
      None.
  
    <Side Effects>
@@ -52,11 +61,11 @@ index 4ade3cc..d9afa98 100755
    <Returns>
 -    A tuple ('options.REPOSITORY_PATH', command, command_arguments).  'command'
 -    'command_arguments' correspond to a repository tool fuction.
-+    An ArgumentParser object with the standard repo commands.
++  An ArgumentParser object with the standard repo commands.
    """
  
    parser = argparse.ArgumentParser(
-@@ -1007,9 +995,28 @@ def parse_arguments():
+@@ -1108,15 +1095,86 @@ def parse_arguments():
        ' levels: 0=UNSET, 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR,'
        ' 5=CRITICAL')
  
@@ -86,11 +95,26 @@ index 4ade3cc..d9afa98 100755
 +  """
  
    # Set the logging level.
-   if parsed_args.verbose == 5:
-@@ -1030,6 +1037,45 @@ def parse_arguments():
-   else:
-     tuf.log.set_log_level(logging.NOTSET)
- 
+-  logging_levels = [logging.NOTSET, logging.DEBUG,
+-      logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL]
++  if parsed_args.verbose == 5:
++    tuf.log.set_log_level(logging.CRITICAL)
++
++  elif parsed_args.verbose == 4:
++    tuf.log.set_log_level(logging.ERROR)
++
++  elif parsed_args.verbose == 3:
++    tuf.log.set_log_level(logging.WARNING)
++
++  elif parsed_args.verbose == 2:
++    tuf.log.set_log_level(logging.INFO)
++
++  elif parsed_args.verbose == 1:
++    tuf.log.set_log_level(logging.DEBUG)
++
++  else:
++    tuf.log.set_log_level(logging.NOTSET)
++
 +
 +
 +def parse_arguments():
@@ -127,12 +151,12 @@ index 4ade3cc..d9afa98 100755
 +  # Should we include usage examples in the help output?
 +
 +  parsed_args = parser.parse_args()
-+
+ 
+-  tuf.log.set_log_level(logging_levels[parsed_args.verbose])
 +  process_log_arguments(parsed_args.verbose)
-+
+ 
    return parsed_args
  
- 
 -- 
-2.17.1
+2.7.4
 

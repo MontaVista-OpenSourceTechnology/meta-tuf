@@ -1,0 +1,43 @@
+diff -Naur tuf_manifest-0.0.3.Orig/tuf_manifest/tuf_manifest_client.py tuf_manifest-0.0.3/tuf_manifest/tuf_manifest_client.py
+--- tuf_manifest-0.0.3.Orig/tuf_manifest/tuf_manifest_client.py	2020-10-12 06:12:28.813618749 +0000
++++ tuf_manifest-0.0.3/tuf_manifest/tuf_manifest_client.py	2020-10-12 06:14:38.465311114 +0000
+@@ -10,7 +10,7 @@
+ """
+ 
+ import os.path
+-import ConfigParser
++import configparser
+ import logging
+ import subprocess
+ import sys
+@@ -134,7 +134,7 @@
+         """
+         if conffile is None:
+             conffile = default_conffile;
+-        config = ConfigParser.ConfigParser(confdefaults)
++        config = configparser.configparser(confdefaults)
+         config.read((conffile))
+         if vardir is None:
+             vardir = config.get("Manifest", "vardir")
+@@ -172,10 +172,10 @@
+         self.handler = handler
+ 
+         try:
+-            numconfig = ConfigParser.ConfigParser({ "curr_manifest" : "1" })
++            numconfig = configparser.configparser({ "curr_manifest" : "1" })
+             numconfig.read((self.numfile))
+             self.curr_num = numconfig.getint("Manifest", "curr_manifest")
+-        except ConfigParser.NoSectionError:
++        except configparser.NoSectionError:
+             self.curr_num = 1
+         return
+ 
+@@ -281,7 +281,7 @@
+ 
+         if rv == 0:
+             # Update was successfull, save the new manifest file number
+-            numconfig = ConfigParser.ConfigParser()
++            numconfig = configparser.configparser()
+             numconfig.add_section("Manifest")
+             numconfig.set("Manifest", "curr_manifest", str(i))
+             numconfig.write(open(self.numfile, "w"))

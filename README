@@ -163,7 +163,7 @@ The basic procedure is:
  3) Add:
 
       INHERIT =+ "tuf-manifest"
-      IMAGE_INSTALL_append = " python-tuf-manifest-client"
+      IMAGE_INSTALL_append = " python3-tuf-manifest-client"
       TUF_MANIFEST_CLIENT_REPO = "/path/to/tuf/tufclient"
       TUF_MANIFEST_CONF = "/path/to/tuf-manifest.conf"
       EXTRA_IMAGE_FEATURES += "package-management"
@@ -197,7 +197,7 @@ The basic procedure is:
 
  4) Build the host version of the tuf-manifest tools:
 
-      bitbake python-tuf-native python-tuf-manifest.native
+      bitbake python3-tuf-native python3-tuf-manifest-native
       bitbake build-sysroots
       source <the proper env script in the project bin directory>
       export PYTHONPATH=${BUILDROOT}/tmp/sysroots/x86_64/usr/lib/python2.7/site-packages

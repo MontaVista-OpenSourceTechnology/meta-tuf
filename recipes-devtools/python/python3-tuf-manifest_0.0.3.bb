@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=d36b156c33ff4e31d4892fe82a3fb978"
 
 SRC_URI += " \
     file://tuf-rpm-updater \
+    file://configparser-namechage.patch \
 "
 
 PYPI_PACKAGE = "tuf_manifest"
@@ -13,11 +14,10 @@ PYPI_PACKAGE = "tuf_manifest"
 SRC_URI[md5sum] = "874bdcf202b54a2742db7023b8fddc16"
 SRC_URI[sha256sum] = "b62234aca76ba4d84558b0ed5b6498c79287780611e54378488b3e84407a8905"
 
-inherit setuptools pypi
+inherit setuptools3 pypi
 inherit tuf-manifest
-
+PR = "1"
 do_install_append() {
-    rm -f ${D}${datadir}/LICENSE
     mkdir -p ${D}${localstatedir}/tuf-manifest
     cp -r ${TUF_MANIFEST_CLIENT_REPO}/tufrepo ${D}${localstatedir}/tuf-manifest
     mkdir -p ${D}${localstatedir}/tuf-manifest/files
@@ -42,6 +42,7 @@ FILES_${PN}-client = " \
     ${sysconfdir}/tuf-manifest.conf \
     ${localstatedir}/tuf-manifest \
     ${libdir}/tuf-manifest/scripts/tuf-rpm-updater \
+    ${datadir}/LICENSE \
 "
 
 CONFFILES_${PN}-client = " \

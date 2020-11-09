@@ -13,3 +13,4 @@ RDEPENDS_${PN} += " \
 "
 
 BBCLASSEXTEND = "native nativesdk"
+
