@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=d36b156c33ff4e31d4892fe82a3fb978"
 
 SRC_URI += " \
     file://tuf-rpm-updater \
-    file://configparser-namechage.patch \
+    file://change-configparser-for-python3.patch \
 "
 
 PYPI_PACKAGE = "tuf_manifest"

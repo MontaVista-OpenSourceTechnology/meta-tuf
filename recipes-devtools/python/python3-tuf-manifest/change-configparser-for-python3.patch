@@ -1,7 +1,17 @@
-diff -Naur tuf_manifest-0.0.3.Orig/tuf_manifest/tuf_manifest_client.py tuf_manifest-0.0.3/tuf_manifest/tuf_manifest_client.py
---- tuf_manifest-0.0.3.Orig/tuf_manifest/tuf_manifest_client.py	2020-10-12 06:12:28.813618749 +0000
-+++ tuf_manifest-0.0.3/tuf_manifest/tuf_manifest_client.py	2020-10-12 06:14:38.465311114 +0000
-@@ -10,7 +10,7 @@
+From b66b84526df82d3b517a41451733fac5b8a696b7 Mon Sep 17 00:00:00 2001
+From: Milan Satpathy <msatpathy@mvista.com>
+Date: Thu, 12 Nov 2020 03:11:03 +0530
+Subject: [PATCH] change configparser for python3
+
+---
+ tuf_manifest/tuf_manifest_client.py | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/tuf_manifest/tuf_manifest_client.py b/tuf_manifest/tuf_manifest_client.py
+index dcaa271..c0f588e 100755
+--- a/tuf_manifest/tuf_manifest_client.py
++++ b/tuf_manifest/tuf_manifest_client.py
+@@ -10,7 +10,7 @@ See the tuf_manifest_client class below for details.
  """
  
  import os.path
@@ -10,21 +20,21 @@ diff -Naur tuf_manifest-0.0.3.Orig/tuf_manifest/tuf_manifest_client.py tuf_manif
  import logging
  import subprocess
  import sys
-@@ -134,7 +134,7 @@
+@@ -134,7 +134,7 @@ class tuf_manifest_client:
          """
          if conffile is None:
              conffile = default_conffile;
 -        config = ConfigParser.ConfigParser(confdefaults)
-+        config = configparser.configparser(confdefaults)
++        config = configparser.ConfigParser(confdefaults)
          config.read((conffile))
          if vardir is None:
              vardir = config.get("Manifest", "vardir")
-@@ -172,10 +172,10 @@
+@@ -172,10 +172,10 @@ class tuf_manifest_client:
          self.handler = handler
  
          try:
 -            numconfig = ConfigParser.ConfigParser({ "curr_manifest" : "1" })
-+            numconfig = configparser.configparser({ "curr_manifest" : "1" })
++            numconfig = configparser.ConfigParser({ "curr_manifest" : "1" })
              numconfig.read((self.numfile))
              self.curr_num = numconfig.getint("Manifest", "curr_manifest")
 -        except ConfigParser.NoSectionError:
@@ -32,12 +42,15 @@ diff -Naur tuf_manifest-0.0.3.Orig/tuf_manifest/tuf_manifest_client.py tuf_manif
              self.curr_num = 1
          return
  
-@@ -281,7 +281,7 @@
+@@ -281,7 +281,7 @@ class tuf_manifest_client:
  
          if rv == 0:
              # Update was successfull, save the new manifest file number
 -            numconfig = ConfigParser.ConfigParser()
-+            numconfig = configparser.configparser()
++            numconfig = configparser.ConfigParser()
              numconfig.add_section("Manifest")
              numconfig.set("Manifest", "curr_manifest", str(i))
              numconfig.write(open(self.numfile, "w"))
+-- 
+2.7.4
+
