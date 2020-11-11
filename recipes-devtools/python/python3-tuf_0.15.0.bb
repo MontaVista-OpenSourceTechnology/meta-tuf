@@ -66,6 +66,7 @@ BASE_TUF_RDEPENDS = " \
     ${PYTHON_PN}-json \
     ${PYTHON_PN}-unixadmin \
     ${PYTHON_PN}-shell \
+    ${PYTHON_PN}-requests \
 "
 
 RDEPENDS_${PN} += "${BASE_TUF_RDEPENDS}"
