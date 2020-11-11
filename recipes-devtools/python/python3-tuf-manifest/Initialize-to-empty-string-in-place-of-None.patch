@@ -1,0 +1,38 @@
+From 21d9440655af8efcd6296bae7c7063642c265a2a Mon Sep 17 00:00:00 2001
+From: Milan Satpathy <msatpathy@mvista.com>
+Date: Thu, 12 Nov 2020 03:35:12 +0530
+Subject: [PATCH] Initialize to empty string in place of None
+
+---
+ tuf_manifest/tuf_manifest_client.py | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+ mode change 100755 => 100644 tuf_manifest/tuf_manifest_client.py
+
+diff --git a/tuf_manifest/tuf_manifest_client.py b/tuf_manifest/tuf_manifest_client.py
+old mode 100755
+new mode 100644
+index c0f588e..bec4a95
+--- a/tuf_manifest/tuf_manifest_client.py
++++ b/tuf_manifest/tuf_manifest_client.py
+@@ -39,12 +39,12 @@ default_vardir = os.path.join(os.sep + "var", "tuf-manifest")
+ 
+ confdefaults = {
+     'vardir'  :  default_vardir,
+-    'numfile' : None,
+-    'repodir' : None,
+-    'filedir' : None,
+-    'url'     : None,
+-    'filebase': None,
+-    'handler' : None
++    'numfile' : '',
++    'repodir' : '',
++    'filedir' : '',
++    'url'     : '',
++    'filebase': '',
++    'handler' : ''
+ }
+ 
+ def read_manifest(filename):
+-- 
+2.7.4
+
