@@ -1,0 +1,49 @@
+From 02ec25809940480f062107c9fdc004b78d3be68a Mon Sep 17 00:00:00 2001
+From: Milan Satpathy <msatpathy@mvista.com>
+Date: Sat, 20 Mar 2021 01:08:24 +0530
+Subject: [PATCH] Process manifest for kernel image update
+
+---
+ tuf_manifest/tuf_manifest_client.py | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/tuf_manifest/tuf_manifest_client.py b/tuf_manifest/tuf_manifest_client.py
+index bab663b..09bf14f 100644
+--- a/tuf_manifest/tuf_manifest_client.py
++++ b/tuf_manifest/tuf_manifest_client.py
+@@ -222,11 +222,16 @@ class tuf_manifest_client:
+         new = []
+         updated = []
+         deleted = []
++        other_updates = []
+         for i in curr_mf:
+             if i in new_mf:
+                 if curr_mf[i][0] != new_mf[i][0]:
+-                    # Version updated
+-                    updated.append(new_mf[i][1])
++                    if new_mf[i][1].endswith(".rpm"):
++                      # package Version updated
++                      updated.append(new_mf[i][1])
++                    else:
++                      #kernel images updates etc.  
++                      other_updates.append(new_mf[i][1])
+                 del new_mf[i]
+             else:
+                 deleted.append(i)
+@@ -242,8 +247,12 @@ class tuf_manifest_client:
+         for i in updated:
+             updatedfp.append(os.path.join(self.filedir, i))
+ 
++        other_updates_fp = []
++        for i in other_updates:
++            other_updates_fp.append(os.path.join(self.filedir, i))
++
+         return subprocess.call((self.handler, " ".join(newfp),
+-                                " ".join(updatedfp), " ".join(deleted)))
++                                " ".join(updatedfp), " ".join(deleted), " ".join(other_updates_fp) ))
+ 
+     def do_update(self):
+         """When the do_update() method is called it will connect to the
+-- 
+2.7.4
+

@@ -1,0 +1,56 @@
+From 5f565e49356e302124bcccccd25706c422b5ed49 Mon Sep 17 00:00:00 2001
+From: Milan Satpathy <msatpathy@mvista.com>
+Date: Mon, 8 Feb 2021 18:49:01 +0530
+Subject: [PATCH] add progressbar support
+
+---
+ tuf_manifest/tuf_manifest_client.py | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/tuf_manifest/tuf_manifest_client.py b/tuf_manifest/tuf_manifest_client.py
+index bec4a95..bab663b 100644
+--- a/tuf_manifest/tuf_manifest_client.py
++++ b/tuf_manifest/tuf_manifest_client.py
+@@ -20,6 +20,9 @@ import tuf.client.updater
+ import tuf.settings
+ import tuf.log
+ 
++from tqdm import tqdm
++from time import sleep
++
+ logger = logging.getLogger('tuf.scripts.client')
+ 
+ default_conffile = os.path.join(os.sep + "etc", "tuf-manifest.conf")
+@@ -190,16 +193,27 @@ class tuf_manifest_client:
+ 
+     def get_files(self, file_list):
+         target_fileinfo = []
++        total_files = 0
+         for f in file_list:
+             target_fileinfo.append(self.updater.get_one_valid_targetinfo(f))
+         updated_targets = self.updater.updated_targets(target_fileinfo,
+                                                        self.filedir)
+-        for target in updated_targets:
++        total_files = len(updated_targets)
++        
++        if total_files == 1:
++          print(updated_targets[0])
++
++        #for target in updated_targets:
++        for i in tqdm(range(len(updated_targets)),ncols=100,desc="Downloading Updates"):
+             try:
+-                self.updater.download_target(target, self.filedir)
++                #self.updater.download_target(target, self.filedir)
++                self.updater.download_target(updated_targets[i], self.filedir)
++                sleep(.1)
+             except tuf.exceptions.DownloadError:
+                 logger.error("Unable to download file '%s'" % target)
+                 raise
++        
++
+         return
+ 
+     def process_new_manifest(self, curr_mff, new_mff):
+-- 
+2.7.4
+

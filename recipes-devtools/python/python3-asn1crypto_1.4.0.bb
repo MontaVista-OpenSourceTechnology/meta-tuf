@@ -1,2 +1,2 @@
 inherit setuptools3
-require python-asn1crypto.inc
+require python3-asn1crypto.inc

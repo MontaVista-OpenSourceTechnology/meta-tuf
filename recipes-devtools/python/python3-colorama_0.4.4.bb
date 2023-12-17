@@ -7,7 +7,6 @@ SECTION = "devel/python"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=b4936429a56a652b84c5c01280dcaa26"
 
-PR = "r0"
 SRCNAME = "colorama"
 
 SRC_URI[md5sum] = "57b22f2597f63df051b69906fbf310cc"

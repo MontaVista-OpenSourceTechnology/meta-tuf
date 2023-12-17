@@ -9,7 +9,7 @@ SRC_URI[sha256sum] = "f92f789e4f9241cd262ad7a555ca2c648a98178a953af117ef7fad46aa
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN}_class-target = " \
+RDEPENDS:${PN}:class-target = " \
     ${PYTHON_PN}-ctypes \
     ${PYTHON_PN}-io \
     ${PYTHON_PN}-pycparser \

@@ -1,18 +1,110 @@
-#!/bin/sh -e
+#!/bin/sh
 
 # If there are any new ($1) or updated($2) files, update or install
 # them.  --force so if we get a partial failure a later update with the
 # same version can be installed.
+
+update_OK=$(cat <<-end
+                                                    .
+                                               u..
+                                          upd..
+                                      updat..
+                                  update..
+                             update suc..
+    update suc..         update succ..
+     update suc..     update succe..
+      update suc..  update suces..
+       update successful.upda..
+        update successful.u.
+         update sucessful.
+end
+)
+
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+
+
+function show_progress()
+{
+  spinner="\\|/-\\|/-"
+  echo -n ' '
+  while true;do
+    for i in `seq 0 7`; do	  
+    echo -n "Applying updates... ${spinner:$i:1}"
+    echo -en "\010\010\010\010\010\010\010\010\010\010\010\010\010\010\010\010\010\010\010\010\010"
+    sleep 0.25
+    done
+  done
+ }
+
+function 
+
+
+show_progress &
+PID=$!
+S1=S2=S3=1
+DATE=$(date|tr " " "_")
+
+#Just dry-run before applying updates
+
+echo "Checking updates before applying.."  >> "/var/log/tuf-$DATE.log" 2>&1
 if [ -n "$1$2" ]; then
-    rpm -U --force $1 $2
+  rpm -U --test --force $1 $2 --quiet >> "/var/log/tuf-$DATE.log" 2>&1
+  S1=$?
+else
+  S1=0     
 fi
 
-# If there are any deleted packages, delete them.
 if [ -n "$3" ]; then
-    rpm -e $3
+  rpm -e --test $3 --quiet >> "/var/log/tuf-$DATE.log" 2>&1
+  S2=$?
+else
+  S2=0    
+fi 
+
+
+if [[ $S1 -eq 0 && $S2 -eq 0 &&  -n "$1$2" ]]; then
+   echo "Installing updates.."  >> "/var/log/tuf-$DATE.log" 2>&1                                                 
+   rpm -U --force $1 $2 --quiet >> "/var/log/tuf-$DATE.log" 2>&1                            
+   S1=$?                                                                                           
+fi                                                                                                 
+                                                                        
+
+if [[ $S1 -eq 0 && -n "$3" ]]; then                                    
+    echo "Removing packages.."  >> "/var/log/tuf-$DATE.log" 2>&1
+    rpm -e $3 --quiet >> "/var/log/tuf-$DATE.log" 2>&1                                      
+    S2=$?                                                                                          
+fi           
+
+
+#kernel image update
+if [[ $S1 -eq 0 && $S2 -eq 0 && -n "$4" ]]; then
+
+  strings "$4" |grep "Linux version 5.4.590.0.1" 2>&1
+  if [[ $? -eq 0 ]];then
+    mv /boot/Image /boot/Image.bkp
+    cp "$4" /boot/Image
+    [[ $? -eq 0 ]] && S3=0
+  fi
+  rm "$4"
+
+else
+  S3=0
+
 fi
+
+
 
 # We don't need the RPMs any more, so delete them.
 rm $1 $2
+
+kill $PID >/dev/null 2>&1
+
+#when at least an install, delete or update parameter existed and all status are set to success
+[[ $# -gt 0 ]] && [[ $S1 -eq 0 ]] && [[ $S2 -eq 0 ]] && [[ $S3 -eq 0 ]] && echo "$update_OK"
+echo""
+
+[[ $(wc -l "/var/log/tuf-$DATE.log" |cut -d " " -f1 ) -gt 0 ]] && echo  "NOTE: For WARNINGS/ERRORS please chek: /var/log/tuf-$DATE.log"
 
 exit 0
