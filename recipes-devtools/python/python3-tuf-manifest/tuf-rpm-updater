@@ -25,7 +25,7 @@ NC='\033[0m' # No Color
 
 
 
-function show_progress()
+show_progress()
 {
   spinner="\\|/-\\|/-"
   echo -n ' '
@@ -37,9 +37,6 @@ function show_progress()
     done
   done
  }
-
-function 
-
 
 show_progress &
 PID=$!
