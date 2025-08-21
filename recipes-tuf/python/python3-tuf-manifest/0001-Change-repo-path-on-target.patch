@@ -1,0 +1,25 @@
+From eb95765c9a8dc71d8ae34d040c434160d9b6d384 Mon Sep 17 00:00:00 2001
+From: Milan Satpathy <msatpathy@mvista.com>
+Date: Sun, 18 Feb 2024 23:02:37 +0530
+Subject: [PATCH] Change repo path on target
+
+---
+ tuf_manifest/tuf_manifest_client.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tuf_manifest/tuf_manifest_client.py b/tuf_manifest/tuf_manifest_client.py
+index 09bf14f..d2269be 100644
+--- a/tuf_manifest/tuf_manifest_client.py
++++ b/tuf_manifest/tuf_manifest_client.py
+@@ -275,7 +275,7 @@ class tuf_manifest_client:
+ 
+         tuf.settings.repositories_directory = self.repodir
+ 
+-        self.updater = tuf.client.updater.Updater('tufrepo', repository_mirrors)
++        self.updater = tuf.client.updater.Updater('.', repository_mirrors)
+ 
+         self.updater.refresh(unsafely_update_root_if_necessary=False)
+ 
+-- 
+2.25.1
+

@@ -1,0 +1,7 @@
+# A dual-boot setup.  The UUIDs are hard-coded so we can reference the same ones in the grub configfile.
+
+part /boot --source bootimg-efi --sourceparams="loader=grub-efi" --ondisk sda --label msdos --active --align 1024
+part / --source rootfs --ondisk sda --fstype=ext4 --label platform --align 1024 --use-uuid --uuid 8299e0f2-c395-4619-a0a0-442f6883d188
+part / --source rootfs --ondisk sda --fstype=ext4 --label platform --align 1024 --use-uuid --uuid 7d4a0c56-dfa3-4dc3-ac00-a41e8d5d6413
+
+bootloader --ptable gpt --configfile secure-update-image.grub

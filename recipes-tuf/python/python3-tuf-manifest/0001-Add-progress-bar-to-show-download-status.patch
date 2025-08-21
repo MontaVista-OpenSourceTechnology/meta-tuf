@@ -1,0 +1,64 @@
+From 153dd9406add2821951de21b34f7078f278493c6 Mon Sep 17 00:00:00 2001
+From: Milan Satpathy <msatpathy@mvista.com>
+Date: Fri, 11 Apr 2025 12:10:59 +0530
+Subject: [PATCH] Add progress bar to show download status
+
+---
+ tuf_manifest/tuf_manifest_client.py | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/tuf_manifest/tuf_manifest_client.py b/tuf_manifest/tuf_manifest_client.py
+index dbcaaa0..87f59b4 100644
+--- a/tuf_manifest/tuf_manifest_client.py
++++ b/tuf_manifest/tuf_manifest_client.py
+@@ -18,6 +18,9 @@ import sys
+ import tuf
+ import tuf.ngclient.updater
+ 
++from tqdm import tqdm
++import pyfiglet
++
+ logger = logging.getLogger('tuf.scripts.client')
+ 
+ default_conffile = os.path.join(os.sep + "etc", "tuf-manifest.conf")
+@@ -208,6 +211,10 @@ class tuf_manifest_client:
+         return updated_targets
+ 
+     def get_files(self, file_list):
++
++        # Display "MvTUF"
++        mvtuf_ascii = pyfiglet.figlet_format("MvTUF")
++
+         target_fileinfo = []
+         for f in file_list:
+             _target_fle_info = self.updater.get_targetinfo(f)
+@@ -219,14 +226,18 @@ class tuf_manifest_client:
+ 
+         updated_targets = self._updated_targets(target_fileinfo,
+                                                        self.filedir)
+-
+-        for target in updated_targets:
+-            try:
+-               local_filepath = os.path.join(self.filedir, target.path)
+-               self.updater.download_target(target, local_filepath, self.target_url)
+-            except tuf.api.exceptions.DownloadError:
+-                logger.error("Unable to download file '%s'" % target)
+-                raise
++        # Show progress bar while downloading
++        if updated_targets:
++            print("\n\033[97m" + mvtuf_ascii + "\033[0m")
++            with tqdm(total=len(updated_targets), desc="Downloading files", unit="file") as pbar:
++                for target in updated_targets:
++                    try:
++                        local_filepath = os.path.join(self.filedir, target.path)
++                        self.updater.download_target(target, local_filepath, self.target_url)
++                        pbar.update(1)
++                    except tuf.api.exceptions.DownloadError:
++                        logger.error("Unable to download file '%s'" % target)
++                        raise
+         return
+ 
+     def process_new_manifest(self, curr_mff, new_mff):
+-- 
+2.34.1
+

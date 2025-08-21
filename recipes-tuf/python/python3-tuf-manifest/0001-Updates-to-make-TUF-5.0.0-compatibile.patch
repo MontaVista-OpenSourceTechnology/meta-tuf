@@ -1,0 +1,146 @@
+From 95190b124b03cc3e1b03f1fbb1e0e09f2a95de1d Mon Sep 17 00:00:00 2001
+From: Milan Satpathy <msatpathy@mvista.com>
+Date: Thu, 10 Apr 2025 18:06:21 +0530
+Subject: [PATCH] Updates to make TUF-5.0.0 compatibile
+
+---
+ tuf_manifest/tuf_manifest_client.py | 60 +++++++++++++++++++++--------
+ 1 file changed, 44 insertions(+), 16 deletions(-)
+
+diff --git a/tuf_manifest/tuf_manifest_client.py b/tuf_manifest/tuf_manifest_client.py
+index 97f8204..dbcaaa0 100644
+--- a/tuf_manifest/tuf_manifest_client.py
++++ b/tuf_manifest/tuf_manifest_client.py
+@@ -16,9 +16,7 @@ import subprocess
+ import sys
+ 
+ import tuf
+-import tuf.client.updater
+-import tuf.settings
+-import tuf.log
++import tuf.ngclient.updater
+ 
+ logger = logging.getLogger('tuf.scripts.client')
+ 
+@@ -127,15 +125,17 @@ class tuf_manifest_client:
+     """
+ 
+     def __init__(self, conffile = None, vardir = None, numfile = None,
+-                 url = None, repodir = None, filedir = None,
++                 url = None, target_url = None,repodir = None, filedir = None,
+                  filebase = None, handler = None):
+         """Allocate a new object.  All the configuration items may be
+         overridden by passing in strings for them.
+         """
+         if conffile is None:
+             conffile = default_conffile;
++
+         config = configparser.ConfigParser(confdefaults)
+-        config.read((conffile))
++        config.read(conffile)
++
+         if vardir is None:
+             vardir = config.get("Manifest", "vardir")
+         if numfile is None:
+@@ -146,6 +146,9 @@ class tuf_manifest_client:
+             url = config.get("Manifest", "url")
+             if url is None:
+                 raise Exception("No url in config file %s" % conffile)
++        if target_url is None:
++            target_url = config.get(section="Manifest", option="target_url")
++
+         if repodir is None:
+             repodir = config.get("Manifest", "repodir")
+             if repodir is None:
+@@ -170,10 +173,11 @@ class tuf_manifest_client:
+         self.filedir = filedir
+         self.filebase = filebase
+         self.handler = handler
++        self.target_url = target_url
+ 
+         try:
+             numconfig = configparser.ConfigParser({ "curr_manifest" : "1" })
+-            numconfig.read((self.numfile))
++            numconfig.read(self.numfile)
+             self.curr_num = numconfig.getint("Manifest", "curr_manifest")
+         except configparser.NoSectionError:
+             self.curr_num = 1
+@@ -188,16 +192,39 @@ class tuf_manifest_client:
+         target = self.get_files([mff])
+         return mff_full
+ 
++    def _updated_targets(self, target_fileinfo, filedir):
++        updated_targets = []
++        for target_info in target_fileinfo:
++            if target_info == None:
++                updated_targets = []
++                break
++
++            target_path = os.path.join(filedir, target_info.path)
++            if os.path.exists(target_path):
++                #target_info['local_file'] = target_path
++                if self.updater.find_cached_target(target_info, target_path):
++                    continue
++            updated_targets.append(target_info)
++        return updated_targets
++
+     def get_files(self, file_list):
+         target_fileinfo = []
+         for f in file_list:
+-            target_fileinfo.append(self.updater.get_one_valid_targetinfo(f))
+-        updated_targets = self.updater.updated_targets(target_fileinfo,
++            _target_fle_info = self.updater.get_targetinfo(f)
++            if _target_fle_info:
++                target_fileinfo.append(_target_fle_info)
++            else:
++                #Target file info unavailable.
++                raise tuf.api.exceptions.DownloadError
++
++        updated_targets = self._updated_targets(target_fileinfo,
+                                                        self.filedir)
++
+         for target in updated_targets:
+             try:
+-                self.updater.download_target(target, self.filedir)
+-            except tuf.exceptions.DownloadError:
++               local_filepath = os.path.join(self.filedir, target.path)
++               self.updater.download_target(target, local_filepath, self.target_url)
++            except tuf.api.exceptions.DownloadError:
+                 logger.error("Unable to download file '%s'" % target)
+                 raise
+         return
+@@ -250,16 +277,17 @@ class tuf_manifest_client:
+                                          'targets_path': 'targets',
+                                          'confined_target_dirs': ['']}}
+ 
+-        tuf.settings.repositories_directory = self.repodir
+-
+-        self.updater = tuf.client.updater.Updater('.', repository_mirrors)
++        self.updater = tuf.ngclient.updater.Updater(metadata_dir=self.repodir,
++                                                    metadata_base_url=self.url,
++                                                    target_dir=self.filedir,
++                                                    target_base_url=self.url)
+ 
+-        self.updater.refresh(unsafely_update_root_if_necessary=False)
++        self.updater.refresh()
+ 
+         # Get the current manifest if we do not already have it.
+         try:
+             curr_mff = self.get_manifest()
+-        except tuf.exceptions.DownloadError:
++        except tuf.api.exceptions.DownloadError:
+             logger.error("Unable to download current manifest")
+             raise
+ 
+@@ -269,7 +297,7 @@ class tuf_manifest_client:
+         while True:
+             try:
+                 new_mff = self.get_manifest(num=i)
+-            except tuf.exceptions.UnknownTargetError:
++            except tuf.api.exceptions.DownloadError:
+                 break
+             i = i + 1
+         if new_mff is None:
+-- 
+2.34.1
+
