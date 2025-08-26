@@ -32,8 +32,6 @@ do_install:append() {
     echo "[Manifest]" >${D}${localstatedir}/tuf-manifest/num
     echo "curr_manifest=${TUF_MANIFEST_FILENR}" >>${D}${localstatedir}/tuf-manifest/num
     mkdir -p ${D}${sysconfdir}
-    #test -n "${TUF_WEBSERVER}"
-    #sed "s%WEBSERVER%${TUF_WEBSERVER}%" <${WORKDIR}/tuf-manifest.conf >${D}${sysconfdir}/tuf-manifest.conf
     cp ${WORKDIR}/tuf-manifest.conf ${D}${sysconfdir}/tuf-manifest.conf
     mkdir -p ${D}${nonarch_libdir}/tuf-manifest/scripts
     cp ${WORKDIR}/tuf-rpm-updater ${D}/${nonarch_libdir}/tuf-manifest/scripts
